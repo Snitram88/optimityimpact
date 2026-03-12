@@ -231,3 +231,36 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+/* =========================
+LOAD IMPACT DATA
+========================= */
+
+async function loadImpactData() {
+
+  try {
+
+    const response = await fetch(
+      "https://ifako-ijaiye-2030.onrender.com/api/public/impact"
+    );
+
+    const data = await response.json();
+
+    if (!data.success) return;
+
+    const impact = data.impact;
+
+    document.getElementById("impactYouth").textContent = impact.youth_total;
+    document.getElementById("impactArtisans").textContent = impact.artisan_total;
+    document.getElementById("impactPartners").textContent = impact.partner_total;
+    document.getElementById("impactJobs").textContent = impact.jobs;
+
+  } catch (err) {
+
+    console.error("Impact load error", err);
+
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", loadImpactData);

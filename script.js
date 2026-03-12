@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
   setupRevealFallback();
   setupCountersAndBars();
   highlightActiveNav();
+  loadImpactData();
+  setupOptimityContactForm();
 });
 
 /* =========================
@@ -177,10 +179,50 @@ function runAnimations(scope) {
 }
 
 /* =========================
+SECTION: LOAD LIVE IMPACT DATA
+========================= */
+
+async function loadImpactData() {
+  try {
+    const response = await fetch(
+      "https://ifako-ijaiye-2030.onrender.com/api/public/impact"
+    );
+
+    const data = await response.json();
+
+    if (!data.success || !data.impact) return;
+
+    const impact = data.impact;
+
+    const heroYouth = document.getElementById("heroImpactYouth");
+    const heroArtisans = document.getElementById("heroImpactArtisans");
+    const heroJobs = document.getElementById("heroImpactJobs");
+    const heroPartners = document.getElementById("heroImpactPartners");
+
+    const bandYouth = document.getElementById("impactYouth");
+    const bandArtisans = document.getElementById("impactArtisans");
+    const bandJobs = document.getElementById("impactJobs");
+    const bandPartners = document.getElementById("impactPartners");
+
+    if (heroYouth) heroYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
+    if (heroArtisans) heroArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
+    if (heroJobs) heroJobs.textContent = Number(impact.jobs || 0).toLocaleString();
+    if (heroPartners) heroPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
+
+    if (bandYouth) bandYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
+    if (bandArtisans) bandArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
+    if (bandJobs) bandJobs.textContent = Number(impact.jobs || 0).toLocaleString();
+    if (bandPartners) bandPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
+  } catch (error) {
+    console.error("Impact API error:", error);
+  }
+}
+
+/* =========================
 SECTION: OPTIMITY CONTACT FORM
 ========================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+function setupOptimityContactForm() {
   const contactForm = document.querySelector(".contact-form-v2");
 
   if (!contactForm) return;
@@ -230,50 +272,4 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
-});
-
-/* =========================
-LOAD IMPACT DATA
-========================= */
-
-/* =========================
-LOAD LIVE IMPACT DATA
-========================= */
-
-async function loadImpactData() {
-  try {
-    const response = await fetch(
-      "https://ifako-ijaiye-2030.onrender.com/api/public/impact"
-    );
-
-    const data = await response.json();
-
-    if (!data.success || !data.impact) return;
-
-    const impact = data.impact;
-
-    const heroYouth = document.getElementById("heroImpactYouth");
-    const heroArtisans = document.getElementById("heroImpactArtisans");
-    const heroJobs = document.getElementById("heroImpactJobs");
-    const heroPartners = document.getElementById("heroImpactPartners");
-
-    const bandYouth = document.getElementById("impactYouth");
-    const bandArtisans = document.getElementById("impactArtisans");
-    const bandJobs = document.getElementById("impactJobs");
-    const bandPartners = document.getElementById("impactPartners");
-
-    if (heroYouth) heroYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
-    if (heroArtisans) heroArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
-    if (heroJobs) heroJobs.textContent = Number(impact.jobs || 0).toLocaleString();
-    if (heroPartners) heroPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
-
-    if (bandYouth) bandYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
-    if (bandArtisans) bandArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
-    if (bandJobs) bandJobs.textContent = Number(impact.jobs || 0).toLocaleString();
-    if (bandPartners) bandPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
-  } catch (error) {
-    console.error("Impact API error:", error);
-  }
 }
-
-document.addEventListener("DOMContentLoaded", loadImpactData);

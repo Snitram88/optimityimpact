@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Inbox | Optimity Impact Solutions</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-text">
+          Optimity Impact Solutions
+          <small>Strategy • Data • Sustainable Growth</small>
+        </span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="programs.html">Programs</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-v2">
+      <div class="hero-noise"></div>
+      <div class="hero-orb hero-orb-a"></div>
+      <div class="hero-orb hero-orb-b"></div>
+
+      <div class="container reveal">
+        <div class="section-tag">Admin Inbox</div>
+        <h1 style="font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -0.04em; margin-bottom: 14px;">
+          Contact messages and inbound enquiries.
+        </h1>
+        <p class="hero-v2-text" style="max-width: 760px;">
+          View all Optimity website submissions in one place. This page is protected and loads messages from your existing backend.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="admin-login-card reveal">
+          <div class="section-tag">Admin Login</div>
+          <h2>Authenticate to view inbox</h2>
+
+          <form id="adminLoginForm" class="admin-login-form">
+            <div class="form-grid-v2">
+              <div class="form-group-admin">
+                <label for="adminEmail">Admin Email</label>
+                <input type="email" id="adminEmail" placeholder="Enter admin email" required />
+              </div>
+
+              <div class="form-group-admin">
+                <label for="adminPassword">Admin Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter admin password" required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+            <p id="adminLoginNotice" class="admin-notice"></p>
+          </form>
+        </div>
+
+        <div class="admin-inbox-shell reveal">
+          <div class="admin-inbox-header">
+            <div>
+              <div class="section-tag">Inbox</div>
+              <h2>Submitted Messages</h2>
+            </div>
+
+            <div class="admin-inbox-tools">
+              <input
+                type="text"
+                id="messageSearch"
+                class="admin-search-input"
+                placeholder="Search by name, email, organization, or interest"
+              />
+              <button id="refreshMessagesBtn" class="btn btn-secondary" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div id="adminInboxNotice" class="admin-notice"></div>
+          <div id="messagesList" class="messages-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-v2">
+    <div class="container footer-v2-shell">
+      <div class="footer-v2-brand">
+        <strong>Optimity Impact Solutions</strong>
+        <p>Internal admin inbox for website enquiries and inbound messages.</p>
+      </div>
+
+      <div class="footer-v2-links">
+        <div>
+          <h4>Company</h4>
+          <a href="index.html">Home</a>
+          <a href="contact.html">Contact</a>
+        </div>
+
+        <div>
+          <h4>Admin</h4>
+          <a href="admin-inbox.html">Inbox</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-v2-bottom">
+      <span>©️ 2026 Optimity Impact Solutions</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

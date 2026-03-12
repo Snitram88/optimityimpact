@@ -236,31 +236,44 @@ document.addEventListener("DOMContentLoaded", function () {
 LOAD IMPACT DATA
 ========================= */
 
+/* =========================
+LOAD LIVE IMPACT DATA
+========================= */
+
 async function loadImpactData() {
-
   try {
-
     const response = await fetch(
       "https://ifako-ijaiye-2030.onrender.com/api/public/impact"
     );
 
     const data = await response.json();
 
-    if (!data.success) return;
+    if (!data.success || !data.impact) return;
 
     const impact = data.impact;
 
-    document.getElementById("impactYouth").textContent = impact.youth_total;
-    document.getElementById("impactArtisans").textContent = impact.artisan_total;
-    document.getElementById("impactPartners").textContent = impact.partner_total;
-    document.getElementById("impactJobs").textContent = impact.jobs;
+    const heroYouth = document.getElementById("heroImpactYouth");
+    const heroArtisans = document.getElementById("heroImpactArtisans");
+    const heroJobs = document.getElementById("heroImpactJobs");
+    const heroPartners = document.getElementById("heroImpactPartners");
 
-  } catch (err) {
+    const bandYouth = document.getElementById("impactYouth");
+    const bandArtisans = document.getElementById("impactArtisans");
+    const bandJobs = document.getElementById("impactJobs");
+    const bandPartners = document.getElementById("impactPartners");
 
-    console.error("Impact load error", err);
+    if (heroYouth) heroYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
+    if (heroArtisans) heroArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
+    if (heroJobs) heroJobs.textContent = Number(impact.jobs || 0).toLocaleString();
+    if (heroPartners) heroPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
 
+    if (bandYouth) bandYouth.textContent = Number(impact.youth_total || 0).toLocaleString();
+    if (bandArtisans) bandArtisans.textContent = Number(impact.artisan_total || 0).toLocaleString();
+    if (bandJobs) bandJobs.textContent = Number(impact.jobs || 0).toLocaleString();
+    if (bandPartners) bandPartners.textContent = Number(impact.partner_total || 0).toLocaleString();
+  } catch (error) {
+    console.error("Impact API error:", error);
   }
-
 }
 
 document.addEventListener("DOMContentLoaded", loadImpactData);

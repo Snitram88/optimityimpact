@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   highlightActiveNav();
   loadImpactData();
   setupOptimityContactForm();
+  setupAdminInbox();
 });
 
 /* =========================
@@ -76,14 +77,11 @@ function setupRevealFallback() {
     function (entries, obs) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-
         entry.target.classList.add("visible");
         obs.unobserve(entry.target);
       });
     },
-    {
-      threshold: 0.12,
-    }
+    { threshold: 0.12 }
   );
 
   revealElements.forEach(function (el) {
@@ -148,14 +146,11 @@ function setupCountersAndBars() {
     function (entries, obs) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-
         runAnimations(entry.target);
         obs.unobserve(entry.target);
       });
     },
-    {
-      threshold: 0.18,
-    }
+    { threshold: 0.18 }
   );
 
   if (revealSections.length) {
@@ -273,3 +268,229 @@ function setupOptimityContactForm() {
     }
   });
 }
+
+/* =========================
+SECTION: ADMIN INBOX
+========================= */
+
+function setupAdminInbox() {
+  const adminLoginCard = document.querySelector(".admin-login-card");
+  const adminLoginForm = document.getElementById("adminLoginForm");
+  const loginNotice = document.getElementById("adminLoginNotice");
+  const inboxNotice = document.getElementById("adminInboxNotice");
+  const messagesList = document.getElementById("messagesList");
+  const searchInput = document.getElementById("messageSearch");
+const refreshBtn = document.getElementById("refreshMessagesBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!adminLoginForm || !messagesList) return;
+
+  let allMessages = [];
+
+  function showLoginNotice(message) {
+    if (loginNotice) {
+      loginNotice.textContent = message;
+    }
+  }
+
+  function showInboxNotice(message) {
+    if (inboxNotice) {
+      inboxNotice.textContent = message;
+    }
+  }
+
+  function getStoredToken() {
+    return localStorage.getItem("optimity_admin_token") || "";
+  }
+
+  function storeToken(token) {
+  localStorage.setItem("optimity_admin_token", token);
+}
+
+function clearToken() {
+  localStorage.removeItem("optimity_admin_token");
+}
+
+  function hideLoginCard() {
+    if (adminLoginCard) {
+      adminLoginCard.style.display = "none";
+    }
+  }
+
+  function showLoginCard() {
+    if (adminLoginCard) {
+      adminLoginCard.style.display = "block";
+    }
+  }
+
+  function renderMessages(messages) {
+    if (!messagesList) return;
+
+    if (!messages.length) {
+      messagesList.innerHTML = `<div class="empty-state">No messages found.</div>`;
+      return;
+    }
+
+    messagesList.innerHTML = messages
+      .map(function (message) {
+        const createdAt = message.created_at
+          ? new Date(message.created_at).toLocaleString()
+          : "No date";
+
+        return `
+          <article class="message-card">
+            <div class="message-card-top">
+              <div>
+                <div class="message-name">${escapeHtml(message.full_name || "No name")}</div>
+                <div class="message-meta">
+                  <span><strong>Email:</strong> ${escapeHtml(message.email || "")}</span>
+                  <span><strong>Organization:</strong> ${escapeHtml(message.organization || "")}</span>
+                  <span><strong>Submitted:</strong> ${escapeHtml(createdAt)}</span>
+                </div>
+              </div>
+
+              <div class="message-interest">
+                ${escapeHtml(message.interest_area || "General")}
+              </div>
+            </div>
+
+            <div class="message-body">${escapeHtml(message.message || "")}</div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function filterMessages() {
+    const query = (searchInput?.value || "").trim().toLowerCase();
+
+    if (!query) {
+      renderMessages(allMessages);
+      return;
+    }
+
+    const filtered = allMessages.filter(function (message) {
+      return (
+        String(message.full_name || "").toLowerCase().includes(query) ||
+        String(message.email || "").toLowerCase().includes(query) ||
+        String(message.organization || "").toLowerCase().includes(query) ||
+        String(message.interest_area || "").toLowerCase().includes(query) ||
+        String(message.message || "").toLowerCase().includes(query)
+      );
+    });
+
+    renderMessages(filtered);
+  }
+
+  async function loadMessages() {
+    const token = getStoredToken();
+
+    if (!token) {
+      showLoginCard();
+      showInboxNotice("Please login first.");
+      return;
+    }
+
+    showInboxNotice("Loading messages...");
+
+    try {
+      const response = await fetch("https://ifako-ijaiye-2030.onrender.com/api/admin/contact-messages", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        showLoginCard();
+        showInboxNotice(result.message || "Failed to load messages.");
+        return;
+      }
+
+      hideLoginCard();
+      allMessages = result.messages || [];
+      renderMessages(allMessages);
+      showInboxNotice(`Loaded ${allMessages.length} message(s).`);
+    } catch (error) {
+      console.error("Admin inbox error:", error);
+      showInboxNotice("Unable to load messages.");
+    }
+  }
+
+  adminLoginForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById("adminEmail")?.value.trim() || "";
+    const password = document.getElementById("adminPassword")?.value.trim() || "";
+
+    showLoginNotice("Signing in...");
+
+    try {
+      const response = await fetch("https://ifako-ijaiye-2030.onrender.com/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        showLoginNotice(result.message || "Login failed.");
+        return;
+      }
+
+      storeToken(result.token);
+      showLoginNotice("Login successful.");
+      hideLoginCard();
+      loadMessages();
+    } catch (error) {
+      console.error("Admin login error:", error);
+      showLoginNotice("Unable to login.");
+    }
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener("input", filterMessages);
+  }
+
+ if (refreshBtn) {
+  refreshBtn.addEventListener("click", loadMessages);
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", function () {
+    clearToken();
+    allMessages = [];
+    showLoginCard();
+    showLoginNotice("Logged out successfully.");
+    showInboxNotice("Please login first.");
+    messagesList.innerHTML = `<div class="empty-state">No messages found.</div>`;
+
+    const adminEmail = document.getElementById("adminEmail");
+    const adminPassword = document.getElementById("adminPassword");
+
+    if (adminEmail) adminEmail.value = "";
+    if (adminPassword) adminPassword.value = "";
+  });
+}
+
+if (getStoredToken()) {
+  hideLoginCard();
+  loadMessages();
+}
+
+/* =========================
+SECTION: HTML ESCAPE
+========================= */
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}}
